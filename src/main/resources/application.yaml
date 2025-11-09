@@ -1,0 +1,71 @@
+server:
+  port: 8080
+
+# 删除main层级，直接使用spring.datasource配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/student_management?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 64526691aA
+  main:
+    allow-circular-references: true
+
+
+
+
+
+
+
+# MyBatis
+mybatis:
+  # mapper??????
+  mapper-locations: classpath:mapper/*.xml
+  # ??????
+  type-aliases-package: com.experiment.studentManagement.model
+  # ????
+  global-config:
+    db-config:
+      # ?????AUTO(??)?NONE(???)?INPUT(????)?ASSIGN_ID(????)?ASSIGN_UUID(UUID)
+      id-type: AUTO
+
+  # ???
+  configuration:
+    # ??????
+    map-underscore-to-camel-case: true
+    # ?????????????
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com:
+      experiment:
+        studentManagement:
+          mapper: debug
+          service: info
+          controller: info
+
+sky:
+  jwt:
+    # ??jwt??????????
+    admin-secret-key: itcast6452ljnnzmkamzndkazmbkazzkanznakqmz
+    # ??jwt????
+    admin-ttl: 720000000
+    # ?????????????
+    admin-token-name: token
+    #???jwt??
+    user-secret-key: itdaiakjsabdkakxnahdkaljxkahdkajxkajxksijd
+    #???jwt????
+    user-ttl: 720000000
+    #???jwt????
+    user-token-name: authentication
+
+
+  #alioss:
+    #endpoint:${sky.alioss.endpoint}
+    #access-key-id:${sky.alioss.access-key-id}
+    #access-key-secret:${sky.alioss.access-key-secret}
+    #bucket-name:${sky.alioss.bucket-name}
+
+
+

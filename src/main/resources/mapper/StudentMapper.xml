@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.StudentMapper">
+    <resultMap id="StudentMap" type="com.experiment.studentManagement.model.Student">
+        <id column="student_id" property="studentId"/>
+        <result column="student_no" property="studentNo"/>
+        <result column="name" property="name"/>
+        <result column="gender" property="gender"/>
+        <result column="id_card" property="idCard"/>
+        <result column="birth_date" property="birthDate"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="admission_date" property="admissionDate"/>
+        <result column="class_id" property="classId"/>
+        <result column="major_id" property="majorId"/>
+        <result column="grade" property="grade"/>
+        <result column="photo_url" property="photoUrl"/>
+        <result column="address" property="homeAddress"/>
+        <result column="emergency_contact" property="emergencyContact"/>
+        <result column="emergency_phone" property="emergencyPhone"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="major" property="major"/>
+        <result column="class_name" property="className"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.Student" useGeneratedKeys="true" keyProperty="studentId">
+        insert into student
+        (student_no, name, gender, id_card, birth_date, phone, email, admission_date, class_id, major_id, grade, photo_url, address, emergency_contact, emergency_phone, created_time, updated_time)
+        values
+        (#{studentNo}, #{name}, #{gender}, #{idCard}, #{birthDate}, #{phone}, #{email}, #{admissionDate}, #{classId}, #{majorId}, #{grade}, #{photoUrl}, #{homeAddress}, #{emergencyContact}, #{emergencyPhone}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="StudentMap">
+        select * from student where student_id = #{studentId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.Student">
+        update student
+        <set>
+            <if test="studentNo != null">student_no = #{studentNo},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="idCard != null">id_card = #{idCard},</if>
+            <if test="birthDate != null">birth_date = #{birthDate},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="admissionDate != null">admission_date = #{admissionDate},</if>
+            <if test="classId != null">class_id = #{classId},</if>
+            <if test="majorId != null">major_id = #{majorId},</if>
+            <if test="grade != null">grade = #{grade},</if>
+            <if test="photoUrl != null">photo_url = #{photoUrl},</if>
+            <if test="homeAddress != null">address = #{homeAddress},</if>
+            <if test="emergencyContact != null">emergency_contact = #{emergencyContact},</if>
+            <if test="emergencyPhone != null">emergency_phone = #{emergencyPhone},</if>
+            updated_time = now()
+        </set>
+        where student_id = #{studentId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from student where student_id = #{studentId}
+    </delete>
+
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(1)
+        from student
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="pageByCondition" parameterType="map" resultMap="StudentMap">
+        select student_id, student_no, name, gender, grade, 
+                (select major_name from major where major_id = student.major_id) as major,
+               (select class_name from class where class_id = student.class_id) as class_name,
+               phone, admission_date
+        from student
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+        </where>
+        order by updated_time desc
+        limit #{limit} offset #{offset}
+    </select>
+</mapper>
