@@ -1,7 +1,7 @@
 server:
   port: 8080
 
-# 删除main层级，直接使用spring.datasource配置
+# 使用spring.datasource配置
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
