@@ -13,4 +13,7 @@ public interface ClassMapper {
 
     @Select("select class_name from class where major_id = #{majorId}")
     List<String> findAllClassName(Integer majorId);
+
+    @Select("select class_name from class where class_id = #{classId}")
+    String findClassNameById(Integer classId);
 }

@@ -67,7 +67,7 @@ public class StudentServiceImpl implements StudentService {
         long total = studentMapper.countByCondition(params);
         List<Student> list = studentMapper.pageByCondition(params);
 
-        // 直接返回 Student 列表，不转换为 VO
+        // 直接返回 Student 列表
         return new PageResult(total, list);
     }
 
@@ -77,6 +77,13 @@ public class StudentServiceImpl implements StudentService {
     public StudentVO getById(Integer studentId) {
         Student s = studentMapper.selectById(studentId);
         if (s == null) return null;
+        //根据班级名称查询班级名称
+        String className = classMapper.findClassNameById(s.getClassId());
+        s.setClassName(className);
+        //根据专业名称查询专业名称
+        String major = majorMapper.findMajorNameById(s.getMajorId());
+        s.setMajor(major);
+
         return toVO(s);
     }
 
