@@ -71,6 +71,15 @@
             <if test="name != null and name != ''">
                 and name like concat('%', #{name}, '%')
             </if>
+            <if test="grade != null">
+                and grade = #{grade}
+            </if>
+            <if test="gender != null and gender != ''">
+                and gender = #{gender}
+            </if>
+            <if test="majorId != null">
+                and major_id = #{majorId}
+            </if>
         </where>
     </select>
 
@@ -83,6 +92,15 @@
         <where>
             <if test="name != null and name != ''">
                 and name like concat('%', #{name}, '%')
+            </if>
+            <if test="grade != null">
+                and grade = #{grade}
+            </if>
+            <if test="gender != null and gender != ''">
+                and gender = #{gender}
+            </if>
+            <if test="majorId != null">
+                and major_id = #{majorId}
             </if>
         </where>
         order by updated_time desc

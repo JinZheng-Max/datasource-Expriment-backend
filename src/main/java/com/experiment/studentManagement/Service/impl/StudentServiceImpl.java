@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -59,10 +59,27 @@ public class StudentServiceImpl implements StudentService {
         int pageSize = Math.max(dto.getPageSize(), 10);
         int offset = (page - 1) * pageSize;
 
+        //构造分页查询的条件
         Map<String, Object> params = new HashMap<>();
         params.put("name", dto.getName());
         params.put("offset", offset);
         params.put("limit", pageSize);
+
+        if (dto.getGrade() != null) {
+            params.put("grade", dto.getGrade());
+        }
+
+        if (dto.getGender() != null && !dto.getGender().isEmpty()) {
+            params.put("gender", dto.getGender());
+        }
+
+        if (dto.getMajor() != null && !dto.getMajor().isEmpty()) {
+            Integer majorId = majorMapper.findIdByName(dto.getMajor());
+            if (majorId == null) {
+                return new PageResult(0, Collections.emptyList());
+            }
+            params.put("majorId", majorId);
+        }
 
         long total = studentMapper.countByCondition(params);
         List<Student> list = studentMapper.pageByCondition(params);

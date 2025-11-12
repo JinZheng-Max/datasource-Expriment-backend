@@ -13,6 +13,15 @@ public class StudentPageQueryDTO implements Serializable {
 
     // 查询字段：按姓名模糊查询
     private String name;
+
+    //年级
+    private Integer grade;
+
+    //专业
+    private String major;
+
+    //性别
+    private String gender;
 }
 
 
