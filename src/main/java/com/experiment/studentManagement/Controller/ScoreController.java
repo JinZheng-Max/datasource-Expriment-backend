@@ -11,5 +11,5 @@ public class ScoreController {
 
 
     //录入成绩
-    @RequestMapping("/add")
+    //@RequestMapping("/add")
 }

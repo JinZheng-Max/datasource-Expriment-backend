@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.StudentStatusMapper">
+    <resultMap id="StatusMap" type="com.experiment.studentManagement.model.StudentStatus">
+        <id column="status_id" property="statusId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="status" property="status"/>
+        <result column="status_date" property="statusDate"/>
+        <result column="current_grade" property="currentGrade"/>
+        <result column="current_major_id" property="currentMajorId"/>
+        <result column="reason" property="reason"/>
+        <result column="remark" property="remark"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="student_no" property="studentNo"/>
+        <result column="name" property="name"/>
+        <result column="major_name" property="majorName"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.StudentStatus" 
+            useGeneratedKeys="true" keyProperty="statusId">
+        insert into student_status
+        (student_id, status, status_date, current_grade, current_major_id, reason, remark, created_time, updated_time)
+        values
+        (#{studentId}, #{status}, #{statusDate}, #{currentGrade}, #{currentMajorId}, #{reason}, #{remark}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="StatusMap">
+        select ss.status_id, ss.student_id, ss.status, ss.status_date, ss.current_grade, 
+               ss.current_major_id, ss.reason, ss.remark,
+               s.student_no, s.name, m.major_name
+        from student_status ss
+        left join student s on ss.student_id = s.student_id
+        left join major m on ss.current_major_id = m.major_id
+        where ss.status_id = #{statusId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.StudentStatus">
+        update student_status
+        <set>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="statusDate != null">status_date = #{statusDate},</if>
+            <if test="currentGrade != null">current_grade = #{currentGrade},</if>
+            <if test="currentMajorId != null">current_major_id = #{currentMajorId},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            updated_time = now()
+        </set>
+        where status_id = #{statusId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from student_status where status_id = #{statusId}
+    </delete>
+
+    <delete id="deleteByStudentId" parameterType="int">
+        delete from student_status where student_id = #{studentId}
+    </delete>
+
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(1)
+        from student_status ss
+        left join student s on ss.student_id = s.student_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%'))
+            </if>
+            <if test="status != null and status != ''">
+                and ss.status = #{status}
+            </if>
+            <if test="grade != null">
+                and ss.current_grade = #{grade}
+            </if>
+        </where>
+    </select>
+
+    <select id="pageByCondition" parameterType="map" resultMap="StatusMap">
+        select ss.status_id, s.student_no, s.name, ss.status, ss.current_grade,
+               m.major_name, ss.status_date, ss.reason
+        from student_status ss
+        left join student s on ss.student_id = s.student_id
+        left join major m on ss.current_major_id = m.major_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%'))
+            </if>
+            <if test="status != null and status != ''">
+                and ss.status = #{status}
+            </if>
+            <if test="grade != null">
+                and ss.current_grade = #{grade}
+            </if>
+        </where>
+        order by ss.updated_time desc
+        limit #{limit} offset #{offset}
+    </select>
+
+    <!-- 查询没有学籍记录的学生ID -->
+    <select id="findStudentsWithoutStatus" resultType="java.lang.Integer">
+        select s.student_id
+        from student s
+        left join student_status ss on s.student_id = ss.student_id
+        where ss.status_id is null
+    </select>
+
+    <!-- 批量插入默认学籍信息 -->
+    <insert id="batchInsertDefaultStatus" parameterType="java.util.List">
+        insert into student_status
+        (student_id, status, status_date, current_grade, current_major_id, reason, created_time, updated_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.studentId}, #{item.status}, #{item.statusDate}, #{item.currentGrade}, 
+             #{item.currentMajorId}, #{item.reason}, now(), now())
+        </foreach>
+    </insert>
+</mapper>

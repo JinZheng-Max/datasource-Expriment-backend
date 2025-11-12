@@ -31,8 +31,6 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private ClassMapper classMapper;
 
-
-
     /**
      * 添加学生
      */
@@ -45,14 +43,15 @@ public class StudentServiceImpl implements StudentService {
         s.setMajorId(majorId);
         Integer classId = classMapper.findClassIdByName(dto.getClassName());
         s.setClassId(classId);
-        //todo 添加照片，暂定为 null
+        // todo 添加照片，暂定为 null
         s.setPhotoUrl(null);
         studentMapper.insert(s);
     }
 
     /**
      * 分页查询
-     * 返回 PageResult<Student>，包含指定字段：studentId, studentNo, name, gender, grade, className, phone, admissionDate
+     * 返回 PageResult<Student>，包含指定字段：studentId, studentNo, name, gender, grade,
+     * className, phone, admissionDate
      */
     public PageResult pageQuery(StudentPageQueryDTO dto) {
         int page = Math.max(dto.getPage(), 1);
@@ -93,8 +92,9 @@ public class StudentServiceImpl implements StudentService {
      */
     public StudentVO getById(Integer studentId) {
         Student s = studentMapper.selectById(studentId);
+
         if (s == null) return null;
-        //根据班级名称查询班级名称
+        //根据班级id查询班级名称
         String className = classMapper.findClassNameById(s.getClassId());
         s.setClassName(className);
         //根据专业名称查询专业名称
@@ -110,19 +110,19 @@ public class StudentServiceImpl implements StudentService {
     public void updateStudent(StuInfoDTO dto) {
         Student s = new Student();
         BeanUtils.copyProperties(dto, s);
-        
+
         // 如果传入了专业名称，转换为专业ID
         if (dto.getMajor() != null && !dto.getMajor().isEmpty()) {
             Integer majorId = majorMapper.findIdByName(dto.getMajor());
             s.setMajorId(majorId);
         }
-        
+
         // 如果传入了班级名称，转换为班级ID
         if (dto.getClassName() != null && !dto.getClassName().isEmpty()) {
             Integer classId = classMapper.findClassIdByName(dto.getClassName());
             s.setClassId(classId);
         }
-        
+
         studentMapper.updateById(s);
     }
 
@@ -144,10 +144,15 @@ public class StudentServiceImpl implements StudentService {
      * 查询对应专业班级名称
      */
     public List<String> findAllClass(String major) {
-        //根据专业名称查询专业id
+        // 根据专业名称查询专业id
         Integer majorId = majorMapper.findIdByName(major);
-        //根据专业id查询班级名称
+        // 根据专业id查询班级名称
         return classMapper.findAllClassName(majorId);
+    }
+
+    @Override
+    public List<Student> getAllStudents() {
+        return studentMapper.findAll();
     }
 
     private StudentVO toVO(Student s) {
@@ -156,5 +161,3 @@ public class StudentServiceImpl implements StudentService {
         return vo;
     }
 }
-
-

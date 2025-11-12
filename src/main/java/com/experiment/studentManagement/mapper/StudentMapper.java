@@ -2,6 +2,7 @@ package com.experiment.studentManagement.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import com.experiment.studentManagement.model.Student;
 import java.util.List;
 import java.util.Map;
@@ -19,4 +20,7 @@ public interface StudentMapper {
     long countByCondition(Map<String, Object> params);
 
     List<Student> pageByCondition(Map<String, Object> params);
+
+    @Select("select student_id, student_no, name from student order by student_no")
+    List<Student> findAll();
 }
