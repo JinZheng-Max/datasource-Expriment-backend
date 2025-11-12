@@ -10,8 +10,9 @@ public class StatusVO {
     private String studentNo;
     private String name;
     private String status;
-    private Integer currentGrade;
-    private String majorName;
+    private Integer currentGrade; // 从student表获取
+    private String majorName; // 从student表获取
+    private String className; // 从student表获取
     private LocalDate statusDate;
     private String reason;
     private String remark;

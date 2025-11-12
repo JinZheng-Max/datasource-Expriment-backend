@@ -43,11 +43,6 @@ public class StudentStatusServiceImpl implements StudentStatusService {
         StudentStatus status = new StudentStatus();
         BeanUtils.copyProperties(dto, status);
 
-        if (dto.getCurrentMajor() != null && !dto.getCurrentMajor().isEmpty()) {
-            Integer majorId = majorMapper.findIdByName(dto.getCurrentMajor());
-            status.setCurrentMajorId(majorId);
-        }
-
         // 先删除该学生的旧学籍记录
         statusMapper.deleteByStudentId(status.getStudentId());
 
@@ -93,11 +88,6 @@ public class StudentStatusServiceImpl implements StudentStatusService {
         StudentStatus status = new StudentStatus();
         BeanUtils.copyProperties(dto, status);
 
-        if (dto.getCurrentMajor() != null && !dto.getCurrentMajor().isEmpty()) {
-            Integer majorId = majorMapper.findIdByName(dto.getCurrentMajor());
-            status.setCurrentMajorId(majorId);
-        }
-
         statusMapper.updateById(status);
     }
 
@@ -123,10 +113,7 @@ public class StudentStatusServiceImpl implements StudentStatusService {
                 StudentStatus status = new StudentStatus();
                 status.setStudentId(studentId);
                 status.setStatus("在读");
-                // 修改：直接使用 LocalDate
                 status.setStatusDate(LocalDate.of(2025, 11, 12));
-                status.setCurrentGrade(student.getGrade());
-                status.setCurrentMajorId(student.getMajorId());
                 status.setReason("初始状态");
                 defaultStatusList.add(status);
             }
