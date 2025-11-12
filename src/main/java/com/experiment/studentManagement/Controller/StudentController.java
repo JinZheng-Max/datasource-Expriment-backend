@@ -1,6 +1,5 @@
 package com.experiment.studentManagement.Controller;
 
-
 import com.experiment.studentManagement.DTO.StuInfoDTO;
 import com.experiment.studentManagement.DTO.StudentPageQueryDTO;
 import com.experiment.studentManagement.Service.StudentService;
@@ -22,9 +21,10 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-
-    /*增加学生
-    @param StuInfoDTO
+    /*
+     * 增加学生
+     * 
+     * @param StuInfoDTO
      */
     @PostMapping("/add")
     public Result addStudent(@RequestBody StuInfoDTO dto) {
@@ -42,7 +42,7 @@ public class StudentController {
     // 修改学生信息
     @PutMapping("/update")
     public Result update(@RequestBody StuInfoDTO dto) {
-        log.info("修改学生信息： dto={}",  dto);
+        log.info("修改学生信息： dto={}", dto);
         studentService.updateStudent(dto);
         return Result.success();
     }
@@ -54,9 +54,11 @@ public class StudentController {
         studentService.deleteById(studentId);
         return Result.success();
     }
+
     /*
-    分页查询学生信息
-    @param StudentPageQueryDTO
+     * 分页查询学生信息
+     * 
+     * @param StudentPageQueryDTO
      */
     @PostMapping("/page")
     public Result<PageResult> page(@RequestBody StudentPageQueryDTO dto) {
@@ -74,8 +76,10 @@ public class StudentController {
         List<String> list = studentService.findAllMajor();
         return Result.success(list);
     }
+
     /**
      * 查询对应专业的所有班级
+     * 
      * @param major
      */
     @GetMapping("/class")
@@ -83,5 +87,14 @@ public class StudentController {
         log.info("查询对应专业的所有班级：{}", major);
         List<String> list = studentService.findAllClass(major);
         return Result.success(list);
+    }
+
+    /**
+     * 查询学生列表
+     */
+    @GetMapping("/list")
+    public Result getStudentList() {
+        log.info("查询学生列表");
+        return Result.success(studentService.getAllStudents());
     }
 }
