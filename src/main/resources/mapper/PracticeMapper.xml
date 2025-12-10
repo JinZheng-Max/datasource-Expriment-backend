@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.PracticeMapper">
+
+    <resultMap id="PracticeMap" type="com.experiment.studentManagement.model.StudentPractice">
+        <id property="recordId" column="record_id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="practiceId" column="practice_id"/>
+        <result property="role" column="role"/>
+        <result property="duration" column="duration"/>
+        <result property="performanceScore" column="performance_score"/>
+        <result property="evaluation" column="evaluation"/>
+        <result property="certificateUrl" column="certificate_url"/>
+        <result property="status" column="status"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="updatedTime" column="updated_time"/>
+        <!-- 活动信息 -->
+        <result property="practiceName" column="practice_name"/>
+        <result property="practiceType" column="practice_type"/>
+        <result property="organizer" column="organizer"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="description" column="description"/>
+        <!-- 学生信息 -->
+        <result property="studentNo" column="student_no"/>
+        <result property="studentName" column="student_name"/>
+    </resultMap>
+
+    <!-- 插入活动信息 -->
+    <insert id="insertPractice" parameterType="com.experiment.studentManagement.model.StudentPractice" 
+            useGeneratedKeys="true" keyProperty="practiceId">
+        insert into social_practice (practice_name, practice_type, organizer, start_date, end_date, description)
+        values (#{practiceName}, #{practiceType}, #{organizer}, #{startDate}, #{endDate}, #{description})
+    </insert>
+
+    <!-- 插入学生参与记录 -->
+    <insert id="insertStudentPractice" parameterType="com.experiment.studentManagement.model.StudentPractice">
+        insert into student_practice (student_id, practice_id, role, duration, performance_score, 
+                                       evaluation, certificate_url, status)
+        values (#{studentId}, #{practiceId}, #{role}, #{duration}, #{performanceScore}, 
+                #{evaluation}, #{certificateUrl}, #{status})
+    </insert>
+
+    <!-- 根据recordId查询详情 -->
+    <select id="selectByRecordId" parameterType="int" resultMap="PracticeMap">
+        select sp.record_id, sp.student_id, sp.practice_id, sp.role, sp.duration, 
+               sp.performance_score, sp.evaluation, sp.certificate_url, sp.status,
+               sp.created_time, sp.updated_time,
+               p.practice_name, p.practice_type, p.organizer, p.start_date, p.end_date, p.description,
+               s.student_no, s.name as student_name
+        from student_practice sp
+        left join social_practice p on sp.practice_id = p.practice_id
+        left join student s on sp.student_id = s.student_id
+        where sp.record_id = #{recordId}
+    </select>
+
+    <!-- 更新活动信息 -->
+    <update id="updatePractice" parameterType="com.experiment.studentManagement.model.StudentPractice">
+        update social_practice
+        <set>
+            <if test="practiceName != null">practice_name = #{practiceName},</if>
+            <if test="practiceType != null">practice_type = #{practiceType},</if>
+            <if test="organizer != null">organizer = #{organizer},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="description != null">description = #{description},</if>
+        </set>
+        where practice_id = #{practiceId}
+    </update>
+
+    <!-- 更新学生参与记录 -->
+    <update id="updateStudentPractice" parameterType="com.experiment.studentManagement.model.StudentPractice">
+        update student_practice
+        <set>
+            <if test="role != null">role = #{role},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="performanceScore != null">performance_score = #{performanceScore},</if>
+            <if test="evaluation != null">evaluation = #{evaluation},</if>
+            <if test="certificateUrl != null">certificate_url = #{certificateUrl},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where record_id = #{recordId}
+    </update>
+
+    <!-- 删除学生参与记录 -->
+    <delete id="deleteByRecordId" parameterType="int">
+        delete from student_practice where record_id = #{recordId}
+    </delete>
+
+    <!-- 删除活动信息 -->
+    <delete id="deleteByPracticeId" parameterType="int">
+        delete from social_practice where practice_id = #{practiceId}
+    </delete>
+
+    <!-- 分页查询总数 -->
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(*)
+        from student_practice sp
+        left join social_practice p on sp.practice_id = p.practice_id
+        left join student s on sp.student_id = s.student_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (s.name like concat('%', #{keyword}, '%') 
+                or p.practice_name like concat('%', #{keyword}, '%'))
+            </if>
+            <if test="practiceType != null and practiceType != ''">
+                and p.practice_type = #{practiceType}
+            </if>
+            <if test="status != null and status != ''">
+                and sp.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!-- 分页查询记录列表 -->
+    <select id="pageByCondition" parameterType="map" resultMap="PracticeMap">
+        select sp.record_id, sp.student_id, sp.practice_id, sp.role, sp.duration, 
+               sp.performance_score, sp.evaluation, sp.certificate_url, sp.status,
+               sp.created_time, sp.updated_time,
+               p.practice_name, p.practice_type, p.organizer, p.start_date, p.end_date, p.description,
+               s.student_no, s.name as student_name
+        from student_practice sp
+        left join social_practice p on sp.practice_id = p.practice_id
+        left join student s on sp.student_id = s.student_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (s.name like concat('%', #{keyword}, '%') 
+                or p.practice_name like concat('%', #{keyword}, '%'))
+            </if>
+            <if test="practiceType != null and practiceType != ''">
+                and p.practice_type = #{practiceType}
+            </if>
+            <if test="status != null and status != ''">
+                and sp.status = #{status}
+            </if>
+        </where>
+        order by sp.created_time desc
+        limit #{offset}, #{limit}
+    </select>
+</mapper>

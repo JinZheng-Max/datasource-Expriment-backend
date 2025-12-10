@@ -12,6 +12,7 @@ public class StatusVO {
     private String status;
     private Integer currentGrade;
     private String majorName;
+    private String className;
     private LocalDate statusDate;
     private String reason;
     private String remark;

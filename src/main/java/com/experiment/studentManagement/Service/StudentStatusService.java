@@ -6,11 +6,11 @@ import com.experiment.studentManagement.VO.StatusVO;
 import com.experiment.studentManagement.result.PageResult;
 
 public interface StudentStatusService {
-    void addStatus(StatusInfoDTO dto);
-
     PageResult pageQuery(StatusPageQueryDTO dto);
 
     StatusVO getById(Integer statusId);
+
+    StatusVO getByStudentId(Integer studentId);
 
     void updateStatus(StatusInfoDTO dto);
 

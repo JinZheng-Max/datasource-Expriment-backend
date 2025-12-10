@@ -21,4 +21,5 @@ public class StudentStatus {
     private String studentNo;
     private String name;
     private String majorName;
+    private String className;
 }

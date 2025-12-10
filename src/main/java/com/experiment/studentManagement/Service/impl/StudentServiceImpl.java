@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -137,8 +134,7 @@ public class StudentServiceImpl implements StudentService {
      * 查询所有专业名称
      */
     public List<String> findAllMajor() {
-        return majorMapper.findAll();
-    }
+        return majorMapper.findAll();}
 
     /**
      * 查询对应专业班级名称
@@ -151,8 +147,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> getAllStudents() {
-        return studentMapper.findAll();
+    public List<Student> getStudentsByGradeAndMajor(Integer grade, String majorName) {
+        return studentMapper.findByGradeAndMajor(grade, majorName);
     }
 
     private StudentVO toVO(Student s) {

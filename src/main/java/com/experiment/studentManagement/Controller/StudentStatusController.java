@@ -19,16 +19,18 @@ public class StudentStatusController {
         this.statusService = statusService;
     }
 
-    @PostMapping("/add")
-    public Result addStatus(@RequestBody StatusInfoDTO dto) {
-        log.info("添加学籍状态：{}", dto);
-        statusService.addStatus(dto);
-        return Result.success();
-    }
-
     @GetMapping("/{statusId}")
     public Result getById(@PathVariable Integer statusId) {
         return Result.success(statusService.getById(statusId));
+    }
+
+    /**
+     * 根据学生ID查询学籍
+     */
+    @GetMapping("/student/{studentId}")
+    public Result getByStudentId(@PathVariable Integer studentId) {
+        log.info("根据学生ID查询学籍：{}", studentId);
+        return Result.success(statusService.getByStudentId(studentId));
     }
 
     @PutMapping("/update")

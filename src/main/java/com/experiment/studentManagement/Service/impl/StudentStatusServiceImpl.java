@@ -34,28 +34,6 @@ public class StudentStatusServiceImpl implements StudentStatusService {
     private StudentMapper studentMapper;
 
     @Override
-    public void addStatus(StatusInfoDTO dto) {
-        // 验证必填字段
-        if (dto.getStatusDate() == null) {
-            throw new IllegalArgumentException("状态变更日期不能为空");
-        }
-
-        StudentStatus status = new StudentStatus();
-        BeanUtils.copyProperties(dto, status);
-
-        if (dto.getCurrentMajor() != null && !dto.getCurrentMajor().isEmpty()) {
-            Integer majorId = majorMapper.findIdByName(dto.getCurrentMajor());
-            status.setCurrentMajorId(majorId);
-        }
-
-        // 先删除该学生的旧学籍记录
-        statusMapper.deleteByStudentId(status.getStudentId());
-
-        // 再插入新记录
-        statusMapper.insert(status);
-    }
-
-    @Override
     public PageResult pageQuery(StatusPageQueryDTO dto) {
         int page = Math.max(dto.getPage(), 1);
         int pageSize = Math.max(dto.getPageSize(), 10);
@@ -78,6 +56,14 @@ public class StudentStatusServiceImpl implements StudentStatusService {
     @Override
     public StatusVO getById(Integer statusId) {
         StudentStatus status = statusMapper.selectById(statusId);
+        if (status == null)
+            return null;
+        return toVO(status);
+    }
+
+    @Override
+    public StatusVO getByStudentId(Integer studentId) {
+        StudentStatus status = statusMapper.selectByStudentId(studentId);
         if (status == null)
             return null;
         return toVO(status);

@@ -90,11 +90,11 @@ public class StudentController {
     }
 
     /**
-     * 查询学生列表
+     * 根据年级和专业查询学生列表
      */
-    @GetMapping("/list")
-    public Result getStudentList() {
-        log.info("查询学生列表");
-        return Result.success(studentService.getAllStudents());
+    @GetMapping("/list/by-grade-major")
+    public Result getStudentsByGradeAndMajor(@RequestParam Integer grade, @RequestParam String majorName) {
+        log.info("根据年级和专业查询学生列表：grade={}, majorName={}", grade, majorName);
+        return Result.success(studentService.getStudentsByGradeAndMajor(grade, majorName));
     }
 }

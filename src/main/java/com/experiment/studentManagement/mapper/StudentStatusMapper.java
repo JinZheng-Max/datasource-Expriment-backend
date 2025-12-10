@@ -12,6 +12,8 @@ public interface StudentStatusMapper {
 
     StudentStatus selectById(@Param("statusId") Integer statusId);
 
+    StudentStatus selectByStudentId(@Param("studentId") Integer studentId);
+
     void updateById(StudentStatus status);
 
     void deleteById(@Param("statusId") Integer statusId);
