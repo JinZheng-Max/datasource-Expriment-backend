@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.ScoreMapper">
+    <resultMap id="ScoreMap" type="com.experiment.studentManagement.model.Score">
+        <id column="score_id" property="scoreId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="semester_id" property="semesterId"/>
+        <result column="regular_score" property="regularScore"/>
+        <result column="midterm_score" property="midtermScore"/>
+        <result column="final_score" property="finalScore"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="grade_point" property="gradePoint"/>
+        <result column="status" property="status"/>
+        <result column="is_pass" property="isPass"/>
+        <result column="is_retake" property="isRetake"/>
+        <result column="retake_times" property="retakeTimes"/>
+        <result column="teacher_name" property="teacherName"/>
+        <result column="remark" property="remark"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="student_no" property="studentNo"/>
+        <result column="student_name" property="studentName"/>
+        <result column="course_code" property="courseCode"/>
+        <result column="course_name" property="courseName"/>
+        <result column="semester_name" property="semesterName"/>
+        <result column="credits" property="credits"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.Score" 
+            useGeneratedKeys="true" keyProperty="scoreId">
+        insert into score
+        (student_id, course_id, semester_id, regular_score, midterm_score, final_score, 
+         total_score, grade_point, status, is_pass, is_retake, retake_times, teacher_name, remark, created_time, updated_time)
+        values
+        (#{studentId}, #{courseId}, #{semesterId}, #{regularScore}, #{midtermScore}, #{finalScore}, 
+         #{totalScore}, #{gradePoint}, #{status}, #{isPass}, #{isRetake}, #{retakeTimes}, #{teacherName}, #{remark}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="ScoreMap">
+        select sc.*, s.student_no, s.name as student_name,
+               c.course_code, c.course_name, c.credits,
+               sem.semester_name
+        from score sc
+        left join student s on sc.student_id = s.student_id
+        left join course c on sc.course_id = c.course_id
+        left join semester sem on sc.semester_id = sem.semester_id
+        where sc.score_id = #{scoreId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.Score">
+        update score
+        <set>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="semesterId != null">semester_id = #{semesterId},</if>
+            <if test="regularScore != null">regular_score = #{regularScore},</if>
+            <if test="midtermScore != null">midterm_score = #{midtermScore},</if>
+            <if test="finalScore != null">final_score = #{finalScore},</if>
+            <if test="totalScore != null">total_score = #{totalScore},</if>
+            <if test="gradePoint != null">grade_point = #{gradePoint},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="isPass != null">is_pass = #{isPass},</if>
+            <if test="isRetake != null">is_retake = #{isRetake},</if>
+            <if test="retakeTimes != null">retake_times = #{retakeTimes},</if>
+            <if test="teacherName != null">teacher_name = #{teacherName},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            updated_time = now()
+        </set>
+        where score_id = #{scoreId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from score where score_id = #{scoreId}
+    </delete>
+
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(1)
+        from score sc
+        left join student s on sc.student_id = s.student_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%'))
+            </if>
+            <if test="semesterId != null">
+                and sc.semester_id = #{semesterId}
+            </if>
+            <if test="courseId != null">
+                and sc.course_id = #{courseId}
+            </if>
+            <if test="status != null and status != ''">
+                and sc.status = #{status}
+            </if>
+            <if test="isPass != null">
+                and sc.is_pass = #{isPass}
+            </if>
+        </where>
+    </select>
+
+    <select id="pageByCondition" parameterType="map" resultMap="ScoreMap">
+        select sc.score_id, sc.student_id, s.student_no, s.name as student_name,
+               sc.course_id, c.course_code, c.course_name, c.credits,
+               sc.semester_id, sem.semester_name,
+               sc.regular_score, sc.midterm_score, sc.final_score, sc.total_score,
+               sc.grade_point, sc.status, sc.is_pass, sc.is_retake, sc.retake_times
+        from score sc
+        left join student s on sc.student_id = s.student_id
+        left join course c on sc.course_id = c.course_id
+        left join semester sem on sc.semester_id = sem.semester_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%'))
+            </if>
+            <if test="semesterId != null">
+                and sc.semester_id = #{semesterId}
+            </if>
+            <if test="courseId != null">
+                and sc.course_id = #{courseId}
+            </if>
+            <if test="status != null and status != ''">
+                and sc.status = #{status}
+            </if>
+            <if test="isPass != null">
+                and sc.is_pass = #{isPass}
+            </if>
+        </where>
+        order by sem.semester_code desc, s.student_no, c.course_code
+        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="findAll" resultMap="ScoreMap">
+        select sc.score_id, s.student_no, s.name as student_name, c.course_name, sc.total_score
+        from score sc
+        left join student s on sc.student_id = s.student_id
+        left join course c on sc.course_id = c.course_id
+        order by sc.created_time desc
+    </select>
+</mapper>

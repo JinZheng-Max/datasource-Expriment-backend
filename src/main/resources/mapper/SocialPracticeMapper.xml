@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.SocialPracticeMapper">
+    <resultMap id="SocialPracticeMap" type="com.experiment.studentManagement.model.SocialPractice">
+        <id column="practice_id" property="practiceId"/>
+        <result column="practice_name" property="practiceName"/>
+        <result column="practice_type" property="practiceType"/>
+        <result column="organizer" property="organizer"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="description" property="description"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.SocialPractice" 
+            useGeneratedKeys="true" keyProperty="practiceId">
+        insert into social_practice
+        (practice_name, practice_type, organizer, start_date, end_date, description, created_time, updated_time)
+        values
+        (#{practiceName}, #{practiceType}, #{organizer}, #{startDate}, #{endDate}, #{description}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="SocialPracticeMap">
+        select practice_id, practice_name, practice_type, organizer, start_date, end_date, description, created_time, updated_time
+        from social_practice 
+        where practice_id = #{practiceId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.SocialPractice">
+        update social_practice
+        <set>
+            <if test="practiceName != null">practice_name = #{practiceName},</if>
+            <if test="practiceType != null">practice_type = #{practiceType},</if>
+            <if test="organizer != null">organizer = #{organizer},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="description != null">description = #{description},</if>
+            updated_time = now()
+        </set>
+        where practice_id = #{practiceId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from social_practice where practice_id = #{practiceId}
+    </delete>
+
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(1) from social_practice
+        <where>
+            <if test="name != null and name != ''">
+                and practice_name like concat('%', #{name}, '%')
+            </if>
+            <if test="practiceType != null and practiceType != ''">
+                and practice_type = #{practiceType}
+            </if>
+        </where>
+    </select>
+
+    <select id="pageByCondition" parameterType="map" resultMap="SocialPracticeMap">
+        select practice_id, practice_name, practice_type, organizer, start_date, end_date
+        from social_practice
+        <where>
+            <if test="name != null and name != ''">
+                and practice_name like concat('%', #{name}, '%')
+            </if>
+            <if test="practiceType != null and practiceType != ''">
+                and practice_type = #{practiceType}
+            </if>
+        </where>
+        order by start_date desc
+        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="findAll" resultMap="SocialPracticeMap">
+        select practice_id, practice_name, practice_type, organizer, start_date, end_date
+        from social_practice
+        order by start_date desc
+    </select>
+</mapper>

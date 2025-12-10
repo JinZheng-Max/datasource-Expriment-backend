@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.CourseMapper">
+    <resultMap id="CourseMap" type="com.experiment.studentManagement.model.Course">
+        <id column="course_id" property="courseId"/>
+        <result column="course_code" property="courseCode"/>
+        <result column="course_name" property="courseName"/>
+        <result column="course_type" property="courseType"/>
+        <result column="credits" property="credits"/>
+        <result column="hours" property="hours"/>
+        <result column="major_id" property="majorId"/>
+        <result column="semester_order" property="semesterOrder"/>
+        <result column="description" property="description"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="major_name" property="majorName"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.Course" 
+            useGeneratedKeys="true" keyProperty="courseId">
+        insert into course
+        (course_code, course_name, course_type, credits, hours, major_id, semester_order, description, created_time, updated_time)
+        values
+        (#{courseCode}, #{courseName}, #{courseType}, #{credits}, #{hours}, #{majorId}, #{semesterOrder}, #{description}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="CourseMap">
+        select c.course_id, c.course_code, c.course_name, c.course_type, c.credits, 
+               c.hours, c.major_id, c.semester_order, c.description, m.major_name
+        from course c
+        left join major m on c.major_id = m.major_id
+        where c.course_id = #{courseId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.Course">
+        update course
+        <set>
+            <if test="courseCode != null">course_code = #{courseCode},</if>
+            <if test="courseName != null">course_name = #{courseName},</if>
+            <if test="courseType != null">course_type = #{courseType},</if>
+            <if test="credits != null">credits = #{credits},</if>
+            <if test="hours != null">hours = #{hours},</if>
+            <if test="majorId != null">major_id = #{majorId},</if>
+            <if test="semesterOrder != null">semester_order = #{semesterOrder},</if>
+            <if test="description != null">description = #{description},</if>
+            updated_time = now()
+        </set>
+        where course_id = #{courseId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from course where course_id = #{courseId}
+    </delete>
+
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(1)
+        from course c
+        left join major m on c.major_id = m.major_id
+        <where>
+            <if test="name != null and name != ''">
+                and (c.course_name like concat('%', #{name}, '%') or c.course_code like concat('%', #{name}, '%'))
+            </if>
+            <if test="courseType != null and courseType != ''">
+                and c.course_type = #{courseType}
+            </if>
+            <if test="majorId != null">
+                and c.major_id = #{majorId}
+            </if>
+        </where>
+    </select>
+
+    <select id="pageByCondition" parameterType="map" resultMap="CourseMap">
+        select c.course_id, c.course_code, c.course_name, c.course_type, c.credits,
+               c.hours, m.major_name, c.semester_order
+        from course c
+        left join major m on c.major_id = m.major_id
+        <where>
+            <if test="name != null and name != ''">
+                and (c.course_name like concat('%', #{name}, '%') or c.course_code like concat('%', #{name}, '%'))
+            </if>
+            <if test="courseType != null and courseType != ''">
+                and c.course_type = #{courseType}
+            </if>
+            <if test="majorId != null">
+                and c.major_id = #{majorId}
+            </if>
+        </where>
+        order by c.course_code
+        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="findAll" resultMap="CourseMap">
+        select course_id, course_code, course_name, credits
+        from course
+        order by course_code
+    </select>
+</mapper>

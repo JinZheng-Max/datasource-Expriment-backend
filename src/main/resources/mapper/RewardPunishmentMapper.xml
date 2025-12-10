@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.RewardPunishmentMapper">
+    <resultMap id="RewardPunishmentMap" type="com.experiment.studentManagement.model.RewardPunishment">
+        <id column="rp_id" property="rpId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="type" property="type"/>
+        <result column="level" property="level"/>
+        <result column="title" property="title"/>
+        <result column="reason" property="reason"/>
+        <result column="award_date" property="awardDate"/>
+        <result column="issuing_unit" property="issuingUnit"/>
+        <result column="certificate_no" property="certificateNo"/>
+        <result column="certificate_url" property="certificateUrl"/>
+        <result column="cancel_date" property="cancelDate"/>
+        <result column="remark" property="remark"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="student_no" property="studentNo"/>
+        <result column="student_name" property="studentName"/>
+        <result column="major_name" property="majorName"/>
+        <result column="class_name" property="className"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.RewardPunishment" 
+            useGeneratedKeys="true" keyProperty="rpId">
+        insert into reward_punishment
+        (student_id, type, level, title, reason, award_date, issuing_unit, certificate_no, 
+         certificate_url, cancel_date, remark, created_time, updated_time)
+        values
+        (#{studentId}, #{type}, #{level}, #{title}, #{reason}, #{awardDate}, #{issuingUnit}, 
+         #{certificateNo}, #{certificateUrl}, #{cancelDate}, #{remark}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="RewardPunishmentMap">
+        select rp.*, s.student_no, s.name as student_name, m.major_name, c.class_name
+        from reward_punishment rp
+        left join student s on rp.student_id = s.student_id
+        left join major m on s.major_id = m.major_id
+        left join class c on s.class_id = c.class_id
+        where rp.rp_id = #{rpId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.RewardPunishment">
+        update reward_punishment
+        <set>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="awardDate != null">award_date = #{awardDate},</if>
+            <if test="issuingUnit != null">issuing_unit = #{issuingUnit},</if>
+            <if test="certificateNo != null">certificate_no = #{certificateNo},</if>
+            <if test="certificateUrl != null">certificate_url = #{certificateUrl},</if>
+            <if test="cancelDate != null">cancel_date = #{cancelDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            updated_time = now()
+        </set>
+        where rp_id = #{rpId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from reward_punishment where rp_id = #{rpId}
+    </delete>
+
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(1)
+        from reward_punishment rp
+        left join student s on rp.student_id = s.student_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%'))
+            </if>
+            <if test="type != null and type != ''">
+                and rp.type = #{type}
+            </if>
+            <if test="level != null and level != ''">
+                and rp.level = #{level}
+            </if>
+        </where>
+    </select>
+
+    <select id="pageByCondition" parameterType="map" resultMap="RewardPunishmentMap">
+        select rp.rp_id, rp.student_id, s.student_no, s.name as student_name, 
+               m.major_name, c.class_name, rp.type, rp.level, rp.title, 
+               rp.award_date, rp.issuing_unit, rp.certificate_no
+        from reward_punishment rp
+        left join student s on rp.student_id = s.student_id
+        left join major m on s.major_id = m.major_id
+        left join class c on s.class_id = c.class_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%'))
+            </if>
+            <if test="type != null and type != ''">
+                and rp.type = #{type}
+            </if>
+            <if test="level != null and level != ''">
+                and rp.level = #{level}
+            </if>
+        </where>
+        order by rp.award_date desc
+        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="findAll" resultMap="RewardPunishmentMap">
+        select rp_id, student_id, type, title, award_date
+        from reward_punishment
+        order by award_date desc
+    </select>
+</mapper>
