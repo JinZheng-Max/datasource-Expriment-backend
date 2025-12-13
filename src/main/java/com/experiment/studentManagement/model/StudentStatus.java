@@ -10,8 +10,6 @@ public class StudentStatus {
     private Integer studentId;
     private String status;
     private LocalDate statusDate;
-    private Integer currentGrade;
-    private Integer currentMajorId;
     private String reason;
     private String remark;
     private LocalDateTime createdTime;
@@ -20,6 +18,7 @@ public class StudentStatus {
     // 用于查询时的扩展字段（非数据库字段）
     private String studentNo;
     private String name;
+    private Integer currentGrade; // 从student表的grade字段获取
     private String majorName;
     private String className;
 }

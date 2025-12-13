@@ -34,6 +34,23 @@ public class StudentStatusServiceImpl implements StudentStatusService {
     private StudentMapper studentMapper;
 
     @Override
+    public void addStatus(StatusInfoDTO dto) {
+        // 验证必填字段
+        if (dto.getStatusDate() == null) {
+            throw new IllegalArgumentException("状态变更日期不能为空");
+        }
+
+        StudentStatus status = new StudentStatus();
+        BeanUtils.copyProperties(dto, status);
+
+        // 先删除该学生的旧学籍记录
+        statusMapper.deleteByStudentId(status.getStudentId());
+
+        // 再插入新记录
+        statusMapper.insert(status);
+    }
+
+    @Override
     public PageResult pageQuery(StatusPageQueryDTO dto) {
         int page = Math.max(dto.getPage(), 1);
         int pageSize = Math.max(dto.getPageSize(), 10);
@@ -62,14 +79,6 @@ public class StudentStatusServiceImpl implements StudentStatusService {
     }
 
     @Override
-    public StatusVO getByStudentId(Integer studentId) {
-        StudentStatus status = statusMapper.selectByStudentId(studentId);
-        if (status == null)
-            return null;
-        return toVO(status);
-    }
-
-    @Override
     public void updateStatus(StatusInfoDTO dto) {
         // 验证必填字段
         if (dto.getStatusDate() == null) {
@@ -78,11 +87,6 @@ public class StudentStatusServiceImpl implements StudentStatusService {
 
         StudentStatus status = new StudentStatus();
         BeanUtils.copyProperties(dto, status);
-
-        if (dto.getCurrentMajor() != null && !dto.getCurrentMajor().isEmpty()) {
-            Integer majorId = majorMapper.findIdByName(dto.getCurrentMajor());
-            status.setCurrentMajorId(majorId);
-        }
 
         statusMapper.updateById(status);
     }
@@ -109,10 +113,7 @@ public class StudentStatusServiceImpl implements StudentStatusService {
                 StudentStatus status = new StudentStatus();
                 status.setStudentId(studentId);
                 status.setStatus("在读");
-                // 修改：直接使用 LocalDate
                 status.setStatusDate(LocalDate.of(2025, 11, 12));
-                status.setCurrentGrade(student.getGrade());
-                status.setCurrentMajorId(student.getMajorId());
                 status.setReason("初始状态");
                 defaultStatusList.add(status);
             }

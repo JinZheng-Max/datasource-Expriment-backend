@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.SemesterMapper">
+    <resultMap id="SemesterMap" type="com.experiment.studentManagement.model.Semester">
+        <id column="semester_id" property="semesterId"/>
+        <result column="semester_code" property="semesterCode"/>
+        <result column="semester_name" property="semesterName"/>
+        <result column="academic_year" property="academicYear"/>
+        <result column="semester_order" property="semesterOrder"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="is_current" property="isCurrent"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.Semester" 
+            useGeneratedKeys="true" keyProperty="semesterId">
+        insert into semester
+        (semester_code, semester_name, academic_year, semester_order, start_date, end_date, is_current, created_time, updated_time)
+        values
+        (#{semesterCode}, #{semesterName}, #{academicYear}, #{semesterOrder}, #{startDate}, #{endDate}, #{isCurrent}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="SemesterMap">
+        select * from semester where semester_id = #{semesterId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.Semester">
+        update semester
+        <set>
+            <if test="semesterCode != null">semester_code = #{semesterCode},</if>
+            <if test="semesterName != null">semester_name = #{semesterName},</if>
+            <if test="academicYear != null">academic_year = #{academicYear},</if>
+            <if test="semesterOrder != null">semester_order = #{semesterOrder},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="isCurrent != null">is_current = #{isCurrent},</if>
+            updated_time = now()
+        </set>
+        where semester_id = #{semesterId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from semester where semester_id = #{semesterId}
+    </delete>
+
+    <select id="findAll" resultMap="SemesterMap">
+        select * from semester order by semester_code desc
+    </select>
+
+    <select id="findCurrentSemester" resultMap="SemesterMap">
+        select * from semester where is_current = true limit 1
+    </select>
+
+    <select id="findByAcademicYearAndOrder" resultMap="SemesterMap">
+        select * from semester 
+        where academic_year = #{academicYear} 
+        and semester_order = #{semesterOrder}
+        limit 1
+    </select>
+
+    <select id="findAllAcademicYears" resultType="string">
+        select distinct academic_year from semester order by academic_year desc
+    </select>
+
+    <delete id="deleteScoresBySemesterId" parameterType="int">
+        delete from score where semester_id = #{semesterId}
+    </delete>
+</mapper>

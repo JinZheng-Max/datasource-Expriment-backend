@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.experiment.studentManagement.mapper.StudentPracticeMapper">
+    <resultMap id="StudentPracticeMap" type="com.experiment.studentManagement.model.StudentPractice">
+        <id column="record_id" property="recordId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="practice_id" property="practiceId"/>
+        <result column="role" property="role"/>
+        <result column="duration" property="duration"/>
+        <result column="performance_score" property="performanceScore"/>
+        <result column="evaluation" property="evaluation"/>
+        <result column="certificate_url" property="certificateUrl"/>
+        <result column="status" property="status"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="student_no" property="studentNo"/>
+        <result column="student_name" property="studentName"/>
+        <result column="practice_name" property="practiceName"/>
+        <result column="practice_type" property="practiceType"/>
+        <result column="organizer" property="organizer"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.experiment.studentManagement.model.StudentPractice" 
+            useGeneratedKeys="true" keyProperty="recordId">
+        insert into student_practice
+        (student_id, practice_id, role, duration, performance_score, evaluation, certificate_url, status, created_time, updated_time)
+        values
+        (#{studentId}, #{practiceId}, #{role}, #{duration}, #{performanceScore}, #{evaluation}, #{certificateUrl}, #{status}, now(), now())
+    </insert>
+
+    <select id="selectById" parameterType="int" resultMap="StudentPracticeMap">
+        select sp.*, s.student_no, s.name as student_name, 
+               p.practice_name, p.practice_type, p.organizer
+        from student_practice sp
+        left join student s on sp.student_id = s.student_id
+        left join social_practice p on sp.practice_id = p.practice_id
+        where sp.record_id = #{recordId}
+    </select>
+
+    <update id="updateById" parameterType="com.experiment.studentManagement.model.StudentPractice">
+        update student_practice
+        <set>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="practiceId != null">practice_id = #{practiceId},</if>
+            <if test="role != null">role = #{role},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="performanceScore != null">performance_score = #{performanceScore},</if>
+            <if test="evaluation != null">evaluation = #{evaluation},</if>
+            <if test="certificateUrl != null">certificate_url = #{certificateUrl},</if>
+            <if test="status != null">status = #{status},</if>
+            updated_time = now()
+        </set>
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        delete from student_practice where record_id = #{recordId}
+    </delete>
+
+    <select id="countByCondition" parameterType="map" resultType="long">
+        select count(1)
+        from student_practice sp
+        left join student s on sp.student_id = s.student_id
+        left join social_practice p on sp.practice_id = p.practice_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%') or p.practice_name like concat('%', #{name}, '%'))
+            </if>
+            <if test="practiceType != null and practiceType != ''">
+                and p.practice_type = #{practiceType}
+            </if>
+            <if test="status != null and status != ''">
+                and sp.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="pageByCondition" parameterType="map" resultMap="StudentPracticeMap">
+        select sp.record_id, sp.student_id, s.student_no, s.name as student_name,
+               sp.practice_id, p.practice_name, p.practice_type, p.organizer,
+               sp.role, sp.duration, sp.performance_score, sp.status
+        from student_practice sp
+        left join student s on sp.student_id = s.student_id
+        left join social_practice p on sp.practice_id = p.practice_id
+        <where>
+            <if test="name != null and name != ''">
+                and (s.name like concat('%', #{name}, '%') or s.student_no like concat('%', #{name}, '%') or p.practice_name like concat('%', #{name}, '%'))
+            </if>
+            <if test="practiceType != null and practiceType != ''">
+                and p.practice_type = #{practiceType}
+            </if>
+            <if test="status != null and status != ''">
+                and sp.status = #{status}
+            </if>
+        </where>
+        order by sp.created_time desc
+        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="findAll" resultMap="StudentPracticeMap">
+        select sp.record_id, sp.student_id, s.name as student_name, p.practice_name
+        from student_practice sp
+        left join student s on sp.student_id = s.student_id
+        left join social_practice p on sp.practice_id = p.practice_id
+        order by sp.created_time desc
+    </select>
+</mapper>

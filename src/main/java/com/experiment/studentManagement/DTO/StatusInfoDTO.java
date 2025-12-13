@@ -9,8 +9,6 @@ public class StatusInfoDTO {
     private Integer studentId;
     private String status;
     private LocalDate statusDate;
-    private Integer currentGrade;
-    private String currentMajor;
     private String reason;
     private String remark;
 }
