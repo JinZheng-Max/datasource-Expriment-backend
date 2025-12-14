@@ -92,8 +92,10 @@
     </select>
 
     <select id="findAll" resultMap="CourseMap">
-        select course_id, course_code, course_name, credits
-        from course
-        order by course_code
+        select c.course_id, c.course_code, c.course_name, c.course_type, c.credits,
+               c.hours, c.major_id, c.semester_order, c.description, m.major_name
+        from course c
+        left join major m on c.major_id = m.major_id
+        order by c.course_code
     </select>
 </mapper>

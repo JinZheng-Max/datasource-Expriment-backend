@@ -19,4 +19,6 @@ public interface ScoreService {
     void deleteById(Integer scoreId);
 
     List<ScoreVO> getAllScores();
+
+    List<ScoreVO> getByStudentId(Integer studentId);
 }

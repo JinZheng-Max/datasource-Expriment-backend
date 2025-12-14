@@ -77,6 +77,12 @@ public class ScoreServiceImpl implements ScoreService {
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }
 
+    @Override
+    public List<ScoreVO> getByStudentId(Integer studentId) {
+        List<Score> list = scoreMapper.findByStudentId(studentId);
+        return list.stream().map(this::toVO).collect(Collectors.toList());
+    }
+
     private ScoreVO toVO(Score score) {
         ScoreVO vo = new ScoreVO();
         BeanUtils.copyProperties(score, vo);

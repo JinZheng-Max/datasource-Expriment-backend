@@ -137,4 +137,18 @@
         left join course c on sc.course_id = c.course_id
         order by sc.created_time desc
     </select>
+
+    <select id="findByStudentId" parameterType="int" resultMap="ScoreMap">
+        select sc.score_id, sc.student_id, s.student_no, s.name as student_name,
+               sc.course_id, c.course_code, c.course_name, c.credits,
+               sc.semester_id, sem.semester_name,
+               sc.regular_score, sc.midterm_score, sc.final_score, sc.total_score,
+               sc.grade_point, sc.status, sc.is_pass, sc.is_retake, sc.retake_times, sc.teacher_name
+        from score sc
+        left join student s on sc.student_id = s.student_id
+        left join course c on sc.course_id = c.course_id
+        left join semester sem on sc.semester_id = sem.semester_id
+        where sc.student_id = #{studentId}
+        order by sem.semester_code desc, c.course_code
+    </select>
 </mapper>

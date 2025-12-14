@@ -6,6 +6,7 @@ import com.experiment.studentManagement.VO.StatusVO;
 import com.experiment.studentManagement.result.PageResult;
 
 public interface StudentStatusService {
+
     PageResult pageQuery(StatusPageQueryDTO dto);
 
     StatusVO getById(Integer statusId);
@@ -13,6 +14,8 @@ public interface StudentStatusService {
     StatusVO getByStudentId(Integer studentId);
 
     void updateStatus(StatusInfoDTO dto);
+
+    void addStatus(StatusInfoDTO dto);
 
     void deleteById(Integer statusId);
 

@@ -17,4 +17,6 @@ public class RewardPunishmentInfoDTO {
     private String certificateUrl;
     private LocalDate cancelDate;
     private String remark;
+    private String status;
+    private String reviewComment;
 }

@@ -27,6 +27,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void changePassword(Integer userId, com.experiment.studentManagement.DTO.ChangePasswordDTO dto) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        if (!MD5Util.verify(dto.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+        user.setPassword(MD5Util.encrypt(dto.getNewPassword()));
+        userMapper.updateById(user);
+    }
+
+    @Override
+    public User getUserById(Integer userId) {
+        return userMapper.findById(userId);
+    }
+
+    @Override
+    public void updateUserInfo(User user) {
+        userMapper.updateById(user);
+    }
+
+    @Override
     public LoginVO login(userLoginDTO dto) {
         User user = userMapper.findByUsername(dto.getUsername());
         if (user == null) {
@@ -42,6 +65,9 @@ public class UserServiceImpl implements UserService {
         claims.put("userId", user.getUserId());
         claims.put("username", user.getUsername());
         claims.put("userType", user.getUserType());
+        if (user.getStudentId() != null) {
+            claims.put("studentId", user.getStudentId());
+        }
 
         String token = JwtUtils.generateToken(
                 claims,
@@ -56,6 +82,7 @@ public class UserServiceImpl implements UserService {
         vo.setUsername(user.getUsername());
         vo.setRealName(user.getRealName());
         vo.setUserType(user.getUserType());
+        vo.setStudentId(user.getStudentId());
         return vo;
     }
 }

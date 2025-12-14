@@ -1,6 +1,8 @@
 package com.experiment.studentManagement.Service.impl;
 
+import com.experiment.studentManagement.DTO.PracticeApplyDTO;
 import com.experiment.studentManagement.DTO.PracticePageQueryDTO;
+import com.experiment.studentManagement.DTO.ReviewDTO;
 import com.experiment.studentManagement.DTO.StudentPracticeInfoDTO;
 import com.experiment.studentManagement.Service.StudentPracticeService;
 import com.experiment.studentManagement.VO.StudentPracticeVO;
@@ -11,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,9 +78,57 @@ public class StudentPracticeServiceImpl implements StudentPracticeService {
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }
 
+    @Override
+    public List<StudentPracticeVO> getByStudentId(Integer studentId) {
+        List<StudentPractice> list = recordMapper.findByStudentId(studentId);
+        return list.stream().map(this::toVO).collect(Collectors.toList());
+    }
+
     private StudentPracticeVO toVO(StudentPractice record) {
         StudentPracticeVO vo = new StudentPracticeVO();
         BeanUtils.copyProperties(record, vo);
         return vo;
+    }
+
+    @Override
+    public void apply(Integer studentId, PracticeApplyDTO dto) {
+        StudentPractice record = new StudentPractice();
+        record.setStudentId(studentId);
+        record.setPracticeId(dto.getPracticeId());
+        record.setRole(dto.getRole());
+        record.setDuration(dto.getDuration());
+        record.setCertificateUrl(dto.getCertificateUrl());
+        record.setApplyRemark(dto.getApplyRemark());
+        record.setApplyTime(LocalDateTime.now());
+        record.setStatus("待审核");
+        recordMapper.insert(record);
+    }
+
+    @Override
+    public void review(Integer reviewerId, ReviewDTO dto) {
+        StudentPractice record = recordMapper.selectById(dto.getId());
+        if (record == null) {
+            throw new RuntimeException("记录不存在");
+        }
+        if (!"待审核".equals(record.getStatus())) {
+            throw new RuntimeException("该记录已审核");
+        }
+        record.setStatus(dto.getStatus());
+        record.setReviewerId(reviewerId);
+        record.setReviewTime(LocalDateTime.now());
+        record.setReviewComment(dto.getReviewComment());
+        if (dto.getPerformanceScore() != null) {
+            record.setPerformanceScore(dto.getPerformanceScore());
+        }
+        if (dto.getEvaluation() != null) {
+            record.setEvaluation(dto.getEvaluation());
+        }
+        recordMapper.updateById(record);
+    }
+
+    @Override
+    public PageResult getPendingList(PracticePageQueryDTO dto) {
+        dto.setStatus("待审核");
+        return pageQuery(dto);
     }
 }

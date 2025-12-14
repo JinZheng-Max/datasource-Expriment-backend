@@ -21,4 +21,6 @@ public interface RewardPunishmentMapper {
     List<RewardPunishment> pageByCondition(Map<String, Object> params);
 
     List<RewardPunishment> findAll();
+
+    List<RewardPunishment> findByStudentId(@Param("studentId") Integer studentId);
 }

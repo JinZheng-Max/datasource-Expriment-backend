@@ -4,6 +4,7 @@ import com.experiment.studentManagement.DTO.StatusInfoDTO;
 import com.experiment.studentManagement.DTO.StatusPageQueryDTO;
 import com.experiment.studentManagement.Service.StudentStatusService;
 import com.experiment.studentManagement.VO.StatusVO;
+import com.experiment.studentManagement.exception.BizException;
 import com.experiment.studentManagement.mapper.MajorMapper;
 import com.experiment.studentManagement.mapper.StudentMapper;
 import com.experiment.studentManagement.mapper.StudentStatusMapper;
@@ -34,23 +35,6 @@ public class StudentStatusServiceImpl implements StudentStatusService {
     private StudentMapper studentMapper;
 
     @Override
-    public void addStatus(StatusInfoDTO dto) {
-        // 验证必填字段
-        if (dto.getStatusDate() == null) {
-            throw new IllegalArgumentException("状态变更日期不能为空");
-        }
-
-        StudentStatus status = new StudentStatus();
-        BeanUtils.copyProperties(dto, status);
-
-        // 先删除该学生的旧学籍记录
-        statusMapper.deleteByStudentId(status.getStudentId());
-
-        // 再插入新记录
-        statusMapper.insert(status);
-    }
-
-    @Override
     public PageResult pageQuery(StatusPageQueryDTO dto) {
         int page = Math.max(dto.getPage(), 1);
         int pageSize = Math.max(dto.getPageSize(), 10);
@@ -79,6 +63,14 @@ public class StudentStatusServiceImpl implements StudentStatusService {
     }
 
     @Override
+    public StatusVO getByStudentId(Integer studentId) {
+        StudentStatus status = statusMapper.selectByStudentId(studentId);
+        if (status == null)
+            return null;
+        return toVO(status);
+    }
+
+    @Override
     public void updateStatus(StatusInfoDTO dto) {
         // 验证必填字段
         if (dto.getStatusDate() == null) {
@@ -89,6 +81,28 @@ public class StudentStatusServiceImpl implements StudentStatusService {
         BeanUtils.copyProperties(dto, status);
 
         statusMapper.updateById(status);
+    }
+
+    @Override
+    public void addStatus(StatusInfoDTO dto) {
+        if (dto.getStudentId() == null) {
+            throw new IllegalArgumentException("学生ID不能为空");
+        }
+        if (dto.getStatusDate() == null) {
+            throw new IllegalArgumentException("状态变更日期不能为空");
+        }
+        if (dto.getStatus() == null || dto.getStatus().isEmpty()) {
+            throw new IllegalArgumentException("学籍状态不能为空");
+        }
+
+        StudentStatus existed = statusMapper.selectByStudentId(dto.getStudentId());
+        if (existed != null) {
+            throw new BizException("该学生已存在学籍记录");
+        }
+
+        StudentStatus status = new StudentStatus();
+        BeanUtils.copyProperties(dto, status);
+        statusMapper.insert(status);
     }
 
     @Override

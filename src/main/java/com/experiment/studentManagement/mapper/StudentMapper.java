@@ -21,10 +21,11 @@ public interface StudentMapper {
 
     List<Student> pageByCondition(Map<String, Object> params);
 
-    @Select("select s.student_id, s.student_no, s.name, s.grade, m.major_name as major " +
+    @Select("select s.student_id, s.student_no, s.name, s.gender, s.grade, m.major_name as major, " +
+            "c.class_name, s.phone, s.admission_date " +
             "from student s " +
             "left join major m on s.major_id = m.major_id " +
-            "where s.grade = #{grade} and m.major_name = #{majorName} " +
-            "order by s.student_no")
-    List<Student> findByGradeAndMajor(@Param("grade") Integer grade, @Param("majorName") String majorName);
+            "left join class c on s.class_id = c.class_id " +
+            "order by s.grade desc, s.student_no")
+    List<Student> findAll();
 }

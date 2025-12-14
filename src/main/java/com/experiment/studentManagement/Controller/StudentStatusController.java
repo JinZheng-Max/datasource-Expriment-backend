@@ -19,7 +19,7 @@ public class StudentStatusController {
         this.statusService = statusService;
     }
 
-    @GetMapping("/{statusId}")
+    @GetMapping("/{statusId:\\d+}")
     public Result getById(@PathVariable Integer statusId) {
         return Result.success(statusService.getById(statusId));
     }
@@ -37,6 +37,13 @@ public class StudentStatusController {
     public Result update(@RequestBody StatusInfoDTO dto) {
         log.info("更新学籍状态：{}", dto);
         statusService.updateStatus(dto);
+        return Result.success();
+    }
+
+    @PostMapping("/add")
+    public Result add(@RequestBody StatusInfoDTO dto) {
+        log.info("添加学籍状态：{}", dto);
+        statusService.addStatus(dto);
         return Result.success();
     }
 

@@ -21,4 +21,6 @@ public interface StudentPracticeMapper {
     List<StudentPractice> pageByCondition(Map<String, Object> params);
 
     List<StudentPractice> findAll();
+
+    List<StudentPractice> findByStudentId(@Param("studentId") Integer studentId);
 }

@@ -21,4 +21,6 @@ public interface ScoreMapper {
     List<Score> pageByCondition(Map<String, Object> params);
 
     List<Score> findAll();
+
+    List<Score> findByStudentId(@Param("studentId") Integer studentId);
 }

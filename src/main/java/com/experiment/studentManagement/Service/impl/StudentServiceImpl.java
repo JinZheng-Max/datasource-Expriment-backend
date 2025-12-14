@@ -7,11 +7,15 @@ import com.experiment.studentManagement.VO.StudentVO;
 import com.experiment.studentManagement.mapper.ClassMapper;
 import com.experiment.studentManagement.mapper.StudentMapper;
 import com.experiment.studentManagement.mapper.MajorMapper;
+import com.experiment.studentManagement.mapper.UserMapper;
 import com.experiment.studentManagement.model.Student;
+import com.experiment.studentManagement.model.User;
 import com.experiment.studentManagement.result.PageResult;
+import com.experiment.studentManagement.utils.MD5Util;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,9 +32,13 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private ClassMapper classMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     /**
-     * 添加学生
+     * 添加学生，同时自动创建学生账号（账号为学号，密码为123456）
      */
+    @Transactional
     public void addStudent(StuInfoDTO dto) {
         Student s = new Student();
         BeanUtils.copyProperties(dto, s);
@@ -43,6 +51,16 @@ public class StudentServiceImpl implements StudentService {
         // todo 添加照片，暂定为 null
         s.setPhotoUrl(null);
         studentMapper.insert(s);
+
+        // 自动创建学生账号
+        User user = new User();
+        user.setUsername(dto.getStudentNo());
+        user.setPassword(MD5Util.encrypt("123456"));
+        user.setUserType("student");
+        user.setRoleId(2); // 学生角色ID
+        user.setStudentId(s.getStudentId());
+        user.setRealName(dto.getName());
+        userMapper.insert(user);
     }
 
     /**
@@ -124,9 +142,11 @@ public class StudentServiceImpl implements StudentService {
     }
 
     /**
-     * 删除学生
+     * 删除学生，同时删除对应的用户账号
      */
+    @Transactional
     public void deleteById(Integer studentId) {
+        userMapper.deleteByStudentId(studentId);
         studentMapper.deleteById(studentId);
     }
 
@@ -147,8 +167,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> getStudentsByGradeAndMajor(Integer grade, String majorName) {
-        return studentMapper.findByGradeAndMajor(grade, majorName);
+    public List<Student> getAllStudents() {
+        return studentMapper.findAll();
     }
 
     private StudentVO toVO(Student s) {

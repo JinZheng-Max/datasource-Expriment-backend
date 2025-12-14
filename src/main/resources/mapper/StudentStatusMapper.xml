@@ -39,6 +39,18 @@
         where ss.status_id = #{statusId}
     </select>
 
+    <select id="selectByStudentId" parameterType="int" resultMap="StatusMap">
+        select ss.status_id, ss.student_id, ss.status, ss.status_date, 
+               ss.reason, ss.remark,
+               s.student_no, s.name, s.grade as current_grade,
+               m.major_name, c.class_name
+        from student_status ss
+        left join student s on ss.student_id = s.student_id
+        left join major m on s.major_id = m.major_id
+        left join class c on s.class_id = c.class_id
+        where ss.student_id = #{studentId}
+    </select>
+
     <update id="updateById" parameterType="com.experiment.studentManagement.model.StudentStatus">
         update student_status
         <set>

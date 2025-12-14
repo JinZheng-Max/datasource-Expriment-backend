@@ -18,6 +18,12 @@ public class RewardPunishment {
     private String certificateUrl;
     private LocalDate cancelDate;
     private String remark;
+    private String status; // 待审核/已通过/未通过
+    private LocalDateTime applyTime;
+    private String applyRemark;
+    private Integer reviewerId;
+    private LocalDateTime reviewTime;
+    private String reviewComment;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 
@@ -26,4 +32,5 @@ public class RewardPunishment {
     private String studentName;
     private String majorName;
     private String className;
+    private String reviewerName;
 }

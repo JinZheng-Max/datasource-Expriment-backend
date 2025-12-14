@@ -23,6 +23,6 @@ public interface StudentService {
 
     List<String> findAllClass(String major);
 
-    List<Student> getStudentsByGradeAndMajor(Integer grade, String majorName);
+    List<Student> getAllStudents();
 
 }

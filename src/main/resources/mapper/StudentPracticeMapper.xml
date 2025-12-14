@@ -13,6 +13,11 @@
         <result column="evaluation" property="evaluation"/>
         <result column="certificate_url" property="certificateUrl"/>
         <result column="status" property="status"/>
+        <result column="apply_time" property="applyTime"/>
+        <result column="apply_remark" property="applyRemark"/>
+        <result column="reviewer_id" property="reviewerId"/>
+        <result column="review_time" property="reviewTime"/>
+        <result column="review_comment" property="reviewComment"/>
         <result column="created_time" property="createdTime"/>
         <result column="updated_time" property="updatedTime"/>
         <result column="student_no" property="studentNo"/>
@@ -20,14 +25,15 @@
         <result column="practice_name" property="practiceName"/>
         <result column="practice_type" property="practiceType"/>
         <result column="organizer" property="organizer"/>
+        <result column="reviewer_name" property="reviewerName"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.experiment.studentManagement.model.StudentPractice" 
             useGeneratedKeys="true" keyProperty="recordId">
         insert into student_practice
-        (student_id, practice_id, role, duration, performance_score, evaluation, certificate_url, status, created_time, updated_time)
+        (student_id, practice_id, role, duration, performance_score, evaluation, certificate_url, status, apply_time, apply_remark, created_time, updated_time)
         values
-        (#{studentId}, #{practiceId}, #{role}, #{duration}, #{performanceScore}, #{evaluation}, #{certificateUrl}, #{status}, now(), now())
+        (#{studentId}, #{practiceId}, #{role}, #{duration}, #{performanceScore}, #{evaluation}, #{certificateUrl}, #{status}, ifnull(#{applyTime}, now()), #{applyRemark}, now(), now())
     </insert>
 
     <select id="selectById" parameterType="int" resultMap="StudentPracticeMap">
@@ -50,6 +56,9 @@
             <if test="evaluation != null">evaluation = #{evaluation},</if>
             <if test="certificateUrl != null">certificate_url = #{certificateUrl},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="reviewerId != null">reviewer_id = #{reviewerId},</if>
+            <if test="reviewTime != null">review_time = #{reviewTime},</if>
+            <if test="reviewComment != null">review_comment = #{reviewComment},</if>
             updated_time = now()
         </set>
         where record_id = #{recordId}
@@ -104,6 +113,17 @@
         from student_practice sp
         left join student s on sp.student_id = s.student_id
         left join social_practice p on sp.practice_id = p.practice_id
+        order by sp.created_time desc
+    </select>
+
+    <select id="findByStudentId" parameterType="int" resultMap="StudentPracticeMap">
+        select sp.record_id, sp.student_id, s.student_no, s.name as student_name,
+               sp.practice_id, p.practice_name, p.practice_type, p.organizer,
+               sp.role, sp.duration, sp.performance_score, sp.status, sp.evaluation
+        from student_practice sp
+        left join student s on sp.student_id = s.student_id
+        left join social_practice p on sp.practice_id = p.practice_id
+        where sp.student_id = #{studentId}
         order by sp.created_time desc
     </select>
 </mapper>
