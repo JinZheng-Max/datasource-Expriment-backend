@@ -42,9 +42,22 @@ public class StudentController {
     // 修改学生信息
     @PutMapping("/update")
     public Result update(@RequestBody StuInfoDTO dto) {
-        log.info("修改学生信息： dto={}", dto);
-        studentService.updateStudent(dto);
-        return Result.success();
+        log.info("🔵 修改学生信息 - 接收到的DTO: {}", dto);
+        log.info("🔵 studentId = {}", dto.getStudentId());
+
+        if (dto.getStudentId() == null) {
+            log.error("❌ studentId 为 null！");
+            return Result.error("学生ID不能为空");
+        }
+
+        try {
+            studentService.updateStudent(dto);
+            log.info("✅ 修改成功");
+            return Result.success();
+        } catch (Exception e) {
+            log.error("❌ 修改失败:", e);
+            return Result.error(e.getMessage());
+        }
     }
 
     // 删除学生

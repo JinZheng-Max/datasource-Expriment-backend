@@ -5,8 +5,10 @@ import com.experiment.studentManagement.DTO.CoursePageQueryDTO;
 import com.experiment.studentManagement.Service.CourseService;
 import com.experiment.studentManagement.VO.CourseVO;
 import com.experiment.studentManagement.mapper.CourseMapper;
+import com.experiment.studentManagement.mapper.MajorMapper;
 import com.experiment.studentManagement.model.Course;
 import com.experiment.studentManagement.result.PageResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,11 +18,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private CourseMapper courseMapper;
+
+    @Autowired
+    private MajorMapper majorMapper;
 
     @Override
     public void addCourse(CourseInfoDTO dto) {
@@ -61,6 +67,11 @@ public class CourseServiceImpl implements CourseService {
     public void updateCourse(CourseInfoDTO dto) {
         Course course = new Course();
         BeanUtils.copyProperties(dto, course);
+
+        // 添加日志,调试majorId是否正确传递
+        log.info("更新课程 - courseId: {}, majorId: {}, courseName: {}",
+                course.getCourseId(), course.getMajorId(), course.getCourseName());
+
         courseMapper.updateById(course);
     }
 
@@ -73,6 +84,12 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseVO> getAllCourses() {
         List<Course> list = courseMapper.findAll();
         return list.stream().map(this::toVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllMajorsWithId() {
+        // 调用MajorMapper获取所有专业信息
+        return majorMapper.findAllWithId();
     }
 
     private CourseVO toVO(Course course) {

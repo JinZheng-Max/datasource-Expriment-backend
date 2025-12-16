@@ -73,7 +73,7 @@ public class StudentServiceImpl implements StudentService {
         int pageSize = Math.max(dto.getPageSize(), 10);
         int offset = (page - 1) * pageSize;
 
-        //构造分页查询的条件
+        // 构造分页查询的条件
         Map<String, Object> params = new HashMap<>();
         params.put("name", dto.getName());
         params.put("offset", offset);
@@ -108,11 +108,12 @@ public class StudentServiceImpl implements StudentService {
     public StudentVO getById(Integer studentId) {
         Student s = studentMapper.selectById(studentId);
 
-        if (s == null) return null;
-        //根据班级id查询班级名称
+        if (s == null)
+            return null;
+        // 根据班级id查询班级名称
         String className = classMapper.findClassNameById(s.getClassId());
         s.setClassName(className);
-        //根据专业名称查询专业名称
+        // 根据专业名称查询专业名称
         String major = majorMapper.findMajorNameById(s.getMajorId());
         s.setMajor(major);
 
@@ -123,22 +124,46 @@ public class StudentServiceImpl implements StudentService {
      * 修改学生信息
      */
     public void updateStudent(StuInfoDTO dto) {
+        // 【关键】验证 studentId 是否存在
+        if (dto.getStudentId() == null) {
+            throw new IllegalArgumentException("学生ID不能为空");
+        }
+
+        // 验证学生是否存在
+        Student existStudent = studentMapper.selectById(dto.getStudentId());
+        if (existStudent == null) {
+            throw new IllegalArgumentException("学生不存在");
+        }
+
         Student s = new Student();
         BeanUtils.copyProperties(dto, s);
 
         // 如果传入了专业名称，转换为专业ID
         if (dto.getMajor() != null && !dto.getMajor().isEmpty()) {
             Integer majorId = majorMapper.findIdByName(dto.getMajor());
+            if (majorId == null) {
+                throw new IllegalArgumentException("专业不存在");
+            }
             s.setMajorId(majorId);
         }
 
         // 如果传入了班级名称，转换为班级ID
         if (dto.getClassName() != null && !dto.getClassName().isEmpty()) {
             Integer classId = classMapper.findClassIdByName(dto.getClassName());
+            if (classId == null) {
+                throw new IllegalArgumentException("班级不存在");
+            }
             s.setClassId(classId);
         }
 
-        studentMapper.updateById(s);
+        // 【关键】确保 studentId 被设置
+        s.setStudentId(dto.getStudentId());
+
+        // 执行更新
+        int updateCount = studentMapper.updateById(s);
+        if (updateCount == 0) {
+            throw new RuntimeException("更新失败");
+        }
     }
 
     /**
@@ -154,7 +179,8 @@ public class StudentServiceImpl implements StudentService {
      * 查询所有专业名称
      */
     public List<String> findAllMajor() {
-        return majorMapper.findAll();}
+        return majorMapper.findAll();
+    }
 
     /**
      * 查询对应专业班级名称

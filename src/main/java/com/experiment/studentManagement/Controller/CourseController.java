@@ -57,4 +57,13 @@ public class CourseController {
         log.info("查询所有课程");
         return Result.success(courseService.getAllCourses());
     }
+
+    /**
+     * 获取所有专业列表(包含ID和名称)
+     */
+    @GetMapping("/majors")
+    public Result getMajors() {
+        log.info("查询所有专业(含ID)");
+        return Result.success(courseService.getAllMajorsWithId());
+    }
 }

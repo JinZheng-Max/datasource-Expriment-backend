@@ -13,7 +13,7 @@ public interface StudentMapper {
 
     Student selectById(@Param("studentId") Integer studentId);
 
-    void updateById(Student student);
+    int updateById(Student student); // 返回受影响的行数
 
     void deleteById(@Param("studentId") Integer studentId);
 
@@ -21,11 +21,6 @@ public interface StudentMapper {
 
     List<Student> pageByCondition(Map<String, Object> params);
 
-    @Select("select s.student_id, s.student_no, s.name, s.gender, s.grade, m.major_name as major, " +
-            "c.class_name, s.phone, s.admission_date " +
-            "from student s " +
-            "left join major m on s.major_id = m.major_id " +
-            "left join class c on s.class_id = c.class_id " +
-            "order by s.grade desc, s.student_no")
+    @Select("select student_id, student_no, name from student order by student_no")
     List<Student> findAll();
 }

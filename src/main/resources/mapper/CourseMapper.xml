@@ -42,6 +42,7 @@
             <if test="courseType != null">course_type = #{courseType},</if>
             <if test="credits != null">credits = #{credits},</if>
             <if test="hours != null">hours = #{hours},</if>
+            <!-- 修复：允许majorId为null或0 -->
             <if test="majorId != null">major_id = #{majorId},</if>
             <if test="semesterOrder != null">semester_order = #{semesterOrder},</if>
             <if test="description != null">description = #{description},</if>

@@ -40,9 +40,9 @@
     <update id="updateById" parameterType="com.experiment.studentManagement.model.Student">
         update student
         <set>
-            <if test="studentNo != null">student_no = #{studentNo},</if>
-            <if test="name != null">name = #{name},</if>
-            <if test="gender != null">gender = #{gender},</if>
+            <if test="studentNo != null and studentNo != ''">student_no = #{studentNo},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="gender != null and gender != ''">gender = #{gender},</if>
             <if test="idCard != null">id_card = #{idCard},</if>
             <if test="birthDate != null">birth_date = #{birthDate},</if>
             <if test="phone != null">phone = #{phone},</if>

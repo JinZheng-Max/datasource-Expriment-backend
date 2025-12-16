@@ -40,7 +40,11 @@
     </insert>
 
     <select id="selectById" parameterType="int" resultMap="ScoreMap">
-        select sc.*, s.student_no, s.name as student_name,
+        select sc.score_id, sc.student_id, sc.course_id, sc.semester_id,
+               sc.regular_score, sc.midterm_score, sc.final_score, sc.total_score,
+               sc.grade_point, sc.status, sc.is_pass, sc.is_retake, sc.retake_times,
+               sc.teacher_name, sc.remark, sc.created_time, sc.updated_time,
+               s.student_no, s.name as student_name,
                c.course_code, c.course_name, c.credits,
                sem.semester_name
         from score sc
